@@ -1,0 +1,1 @@
+﻿export default function RecuperarSenha() { return <div className='p-8 text-center'><h1>Recuperar Senha</h1><p>Em construção...</p></div> }

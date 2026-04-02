@@ -1,0 +1,55 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-primary: #2d7d46;
+  --color-primary-light: #4caf73;
+  --color-primary-dark: #1b5c32;
+  --color-secondary: #4a90d9;
+  --color-accent: #f5a623;
+  --color-danger: #d94a4a;
+  --color-bg: #f7f9f8;
+  --color-surface: #ffffff;
+  --color-text: #1a1a1a;
+  --color-text-muted: #6b7280;
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-text font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+  }
+}
+
+/* Leaflet override — garantir z-index correto */
+.leaflet-container {
+  @apply w-full h-full z-0;
+}
+
+.leaflet-pane,
+.leaflet-tile-pane {
+  z-index: 1;
+}
+
+.leaflet-overlay-pane {
+  z-index: 4;
+}
+
+.leaflet-marker-pane {
+  z-index: 6;
+}
+
+.leaflet-popup-pane {
+  z-index: 8;
+}

@@ -1,0 +1,231 @@
+// EcoMed — Schema Prisma (PostgreSQL + PostGIS)
+// Documentação: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── USUÁRIOS ────────────────────────────────────────────────
+
+model Usuario {
+  id           String   @id @default(uuid())
+  nome         String
+  email        String   @unique
+  senhaHash    String?
+  provider     Provider @default(EMAIL)
+  providerId   String?
+  perfil       Perfil   @default(CIDADAO)
+  ativo        Boolean  @default(true)
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  favoritos Favorito[]
+  reportes  Reporte[]
+  parceiro  Parceiro?
+  tokens    RefreshToken[]
+
+  @@map("usuarios")
+}
+
+enum Provider {
+  EMAIL
+  GOOGLE
+}
+
+enum Perfil {
+  CIDADAO
+  PARCEIRO
+  ADMIN
+}
+
+// ─── REFRESH TOKENS ──────────────────────────────────────────
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  usuarioId String
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  criadoEm  DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+// ─── PARCEIROS ───────────────────────────────────────────────
+
+model Parceiro {
+  id           String         @id @default(uuid())
+  usuarioId    String         @unique
+  usuario      Usuario        @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  razaoSocial  String
+  cnpj         String         @unique
+  telefone     String?
+  status       StatusParceiro @default(PENDENTE)
+  criadoEm     DateTime       @default(now())
+  atualizadoEm DateTime       @updatedAt
+
+  pontos PontoColeta[]
+
+  @@map("parceiros")
+}
+
+enum StatusParceiro {
+  PENDENTE
+  APROVADO
+  REJEITADO
+  SUSPENSO
+}
+
+// ─── PONTOS DE COLETA ────────────────────────────────────────
+
+model PontoColeta {
+  id            String   @id @default(uuid())
+  parceiroId    String
+  parceiro      Parceiro @relation(fields: [parceiroId], references: [id], onDelete: Cascade)
+  nome          String
+  descricao     String?
+  cep           String
+  logradouro    String
+  numero        String
+  complemento   String?
+  bairro        String
+  cidade        String
+  estado        String   @db.Char(2)
+  latitude      Float
+  longitude     Float
+  fotoUrl       String?
+  ativo         Boolean  @default(true)
+  verificado    Boolean  @default(false)
+  visualizacoes Int      @default(0)
+  criadoEm      DateTime @default(now())
+  atualizadoEm  DateTime @updatedAt
+
+  horarios      Horario[]
+  tiposResiduos PontoResiduos[]
+  favoritos     Favorito[]
+  reportes      Reporte[]
+
+  @@map("pontos_coleta")
+}
+
+// ─── HORÁRIOS ────────────────────────────────────────────────
+
+model Horario {
+  id        String      @id @default(uuid())
+  pontoId   String
+  ponto     PontoColeta @relation(fields: [pontoId], references: [id], onDelete: Cascade)
+  diaSemana DiaSemana
+  abreAs    String
+  fechaAs   String
+
+  @@map("horarios")
+}
+
+enum DiaSemana {
+  SEGUNDA
+  TERCA
+  QUARTA
+  QUINTA
+  SEXTA
+  SABADO
+  DOMINGO
+}
+
+// ─── TIPOS DE RESÍDUO ────────────────────────────────────────
+
+model TipoResiduo {
+  id    String  @id @default(uuid())
+  nome  String  @unique
+  icone String?
+
+  pontos PontoResiduos[]
+
+  @@map("tipos_residuos")
+}
+
+model PontoResiduos {
+  pontoId   String
+  residuoId String
+  ponto     PontoColeta @relation(fields: [pontoId], references: [id], onDelete: Cascade)
+  residuo   TipoResiduo @relation(fields: [residuoId], references: [id], onDelete: Cascade)
+
+  @@id([pontoId, residuoId])
+  @@map("ponto_residuos")
+}
+
+// ─── FAVORITOS ───────────────────────────────────────────────
+
+model Favorito {
+  usuarioId String
+  pontoId   String
+  usuario   Usuario     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  ponto     PontoColeta @relation(fields: [pontoId], references: [id], onDelete: Cascade)
+  criadoEm  DateTime    @default(now())
+
+  @@id([usuarioId, pontoId])
+  @@map("favoritos")
+}
+
+// ─── REPORTES ────────────────────────────────────────────────
+
+model Reporte {
+  id        String        @id @default(uuid())
+  pontoId   String
+  usuarioId String?
+  ponto     PontoColeta   @relation(fields: [pontoId], references: [id], onDelete: Cascade)
+  usuario   Usuario?      @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  motivo    MotivoReporte
+  descricao String?
+  status    StatusReporte @default(ABERTO)
+  criadoEm  DateTime      @default(now())
+
+  @@map("reportes")
+}
+
+enum MotivoReporte {
+  PONTO_FECHADO
+  ENDERECO_ERRADO
+  NAO_ACEITA_RESIDUO
+  OUTRO
+}
+
+enum StatusReporte {
+  ABERTO
+  EM_ANALISE
+  RESOLVIDO
+  DESCARTADO
+}
+
+// ─── PUSH SUBSCRIPTIONS ──────────────────────────────────────
+
+model PushSubscription {
+  id        String   @id @default(uuid())
+  usuarioId String?
+  endpoint  String   @unique
+  keys      Json
+  criadoEm  DateTime @default(now())
+
+  @@map("push_subscriptions")
+}
+
+// ─── BLOG ────────────────────────────────────────────────────
+
+model Artigo {
+  id           String    @id @default(uuid())
+  slug         String    @unique
+  titulo       String
+  resumo       String
+  conteudo     String    @db.Text
+  imagemUrl    String?
+  publicado    Boolean   @default(false)
+  publicadoEm  DateTime?
+  criadoEm     DateTime  @default(now())
+  atualizadoEm DateTime  @updatedAt
+
+  @@map("artigos")
+}

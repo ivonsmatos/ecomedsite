@@ -1,0 +1,128 @@
+name: EcoMed CI
+
+on:
+  push:
+    branches: [main, staging, dev]
+  pull_request:
+    branches: [main, staging]
+
+jobs:
+  # ─── Frontend ─────────────────────────────────────────────────
+  test-frontend:
+    name: Frontend — Lint, Test & Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci --legacy-peer-deps
+
+      - name: Verificar tipos TypeScript
+        run: npx tsc --noEmit
+
+      - name: Executar testes
+        run: npm run test -- --passWithNoTests
+
+      - name: Build de produção
+        run: npm run build
+        env:
+          VITE_API_URL: https://api.ecomed.com.br/v1
+          VITE_VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+
+  # ─── Backend ──────────────────────────────────────────────────
+  test-backend:
+    name: Backend — Lint, Test & Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ecomed_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci --legacy-peer-deps
+
+      - name: Gerar Prisma Client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ecomed_test
+
+      - name: Executar migrations
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ecomed_test
+
+      - name: Verificar tipos TypeScript
+        run: npx tsc --noEmit
+
+      - name: Executar testes
+        run: npm test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ecomed_test
+          JWT_SECRET: test_secret_key_para_ci
+          NODE_ENV: test
+
+      - name: Build
+        run: npm run build
+
+  # ─── Deploy Staging ──────────────────────────────────────────
+  deploy-staging:
+    name: Deploy — Staging
+    needs: [test-frontend, test-backend]
+    if: github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy Frontend (Vercel)
+        run: echo "Deploy para Vercel staging via Vercel GitHub Integration"
+      - name: Deploy Backend (Railway)
+        run: echo "Deploy para Railway staging via webhook"
+
+  # ─── Deploy Produção ─────────────────────────────────────────
+  deploy-prod:
+    name: Deploy — Produção
+    needs: [test-frontend, test-backend]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production  # Requer aprovação manual no GitHub
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy Frontend (Vercel Production)
+        run: echo "Deploy automático via Vercel (main branch)"
+      - name: Deploy Backend (Railway Production)
+        run: echo "Deploy automático via Railway (main branch)"
