@@ -8,15 +8,15 @@ PWA para facilitar o descarte correto de medicamentos vencidos ou sem uso no Bra
 
 ## Stack
 
-| Camada | Tecnologia |
-|--------|-----------|
+| Camada   | Tecnologia                                        |
+| -------- | ------------------------------------------------- |
 | Frontend | React 18 + Vite + TypeScript + Tailwind CSS + PWA |
-| Mapa | Leaflet + OpenStreetMap |
-| Estado | Zustand + TanStack Query |
-| Backend | Node.js 20 + Express + Prisma ORM |
-| Banco | PostgreSQL 16 + PostGIS |
-| Cache | Redis (Upstash) |
-| Deploy | Vercel (front) + Railway (back) + Supabase (DB) |
+| Mapa     | Leaflet + OpenStreetMap                           |
+| Estado   | Zustand + TanStack Query                          |
+| Backend  | Node.js 20 + Express + Prisma ORM                 |
+| Banco    | PostgreSQL 16 + PostGIS                           |
+| Cache    | Redis (Upstash)                                   |
+| Deploy   | Vercel (front) + Railway (back) + Supabase (DB)   |
 
 ---
 
@@ -112,24 +112,24 @@ ecomed/
 
 **Base URL (dev):** `http://localhost:3000/api/v1`
 
-| Método | Endpoint | Auth | Descrição |
-|--------|----------|------|-----------|
-| POST | `/auth/register` | ❌ | Cadastro cidadão |
-| POST | `/auth/login` | ❌ | Login e-mail/senha |
-| POST | `/auth/refresh` | ❌ | Renovar access token |
-| GET | `/pontos` | ❌ | Listar pontos com filtros |
-| GET | `/pontos/proximos` | ❌ | Busca geoespacial |
-| GET | `/pontos/:id` | ❌ | Detalhe do ponto |
-| POST | `/parceiro/solicitar` | PARCEIRO | Solicitar cadastro de ponto |
-| GET | `/admin/dashboard` | ADMIN | Métricas globais |
+| Método | Endpoint              | Auth     | Descrição                   |
+| ------ | --------------------- | -------- | --------------------------- |
+| POST   | `/auth/register`      | ❌       | Cadastro cidadão            |
+| POST   | `/auth/login`         | ❌       | Login e-mail/senha          |
+| POST   | `/auth/refresh`       | ❌       | Renovar access token        |
+| GET    | `/pontos`             | ❌       | Listar pontos com filtros   |
+| GET    | `/pontos/proximos`    | ❌       | Busca geoespacial           |
+| GET    | `/pontos/:id`         | ❌       | Detalhe do ponto            |
+| POST   | `/parceiro/solicitar` | PARCEIRO | Solicitar cadastro de ponto |
+| GET    | `/admin/dashboard`    | ADMIN    | Métricas globais            |
 
 ---
 
 ## Credenciais de Teste (após seed)
 
-| Perfil | E-mail | Senha |
-|--------|--------|-------|
-| Admin | admin@ecomed.com.br | Admin@123 |
+| Perfil   | E-mail                  | Senha        |
+| -------- | ----------------------- | ------------ |
+| Admin    | admin@ecomed.com.br     | Admin@123    |
 | Parceiro | farmacia@exemplo.com.br | Parceiro@123 |
 
 ---
@@ -153,4 +153,4 @@ Este projeto auxilia o cumprimento da **RDC 222/2018 da ANVISA** — Regulamento
 
 ---
 
-*EcoMed — Projeto Integrador · Coordenação Técnica · Abril de 2026*
+_EcoMed — Projeto Integrador · Coordenação Técnica · Abril de 2026_

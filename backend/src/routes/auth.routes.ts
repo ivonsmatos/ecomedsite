@@ -27,7 +27,8 @@ function gerarAccessToken(usuario: { id: string; email: string; perfil: string }
   return jwt.sign(
     { sub: usuario.id, email: usuario.email, perfil: usuario.perfil },
     process.env.JWT_SECRET!,
-    { expiresIn: process.env.JWT_EXPIRES_IN ?? '15m' },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    { expiresIn: process.env.JWT_EXPIRES_IN ?? '15m' } as any,
   )
 }
 

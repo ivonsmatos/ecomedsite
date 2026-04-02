@@ -11,8 +11,8 @@ router.get('/', async (req, res) => {
   const { cidade, estado, verificado, page = '1', limit = '20' } = req.query
 
   const where: Record<string, unknown> = { ativo: true }
-  if (cidade) where.cidade = cidade
-  if (estado) where.estado = estado
+  if (cidade) where.cidade = String(cidade)
+  if (estado) where.estado = String(estado)
   if (verificado === 'true') where.verificado = true
 
   const skip = (Number(page) - 1) * Number(limit)
@@ -139,7 +139,7 @@ router.post('/:id/reporte', autenticar, async (req, res) => {
 
   await prisma.reporte.create({
     data: {
-      pontoId: req.params.id,
+      pontoId: String(req.params.id),
       usuarioId: req.usuario!.sub,
       ...parsed.data,
     },
@@ -152,7 +152,7 @@ router.post('/:id/reporte', autenticar, async (req, res) => {
 
 router.post('/:id/favorito', autenticar, async (req, res) => {
   const usuarioId = req.usuario!.sub
-  const pontoId = req.params.id
+  const pontoId = String(req.params.id)
 
   const existente = await prisma.favorito.findUnique({
     where: { usuarioId_pontoId: { usuarioId, pontoId } },
