@@ -1,8 +1,14 @@
-# EcoMed — Descarte Responsável de Medicamentos
+# EcoMed — Plataforma de Descarte Consciente de Resíduos de Saúde
 
-[![CI](https://github.com/seu-usuario/ecomed/actions/workflows/ci.yml/badge.svg)](https://github.com/seu-usuario/ecomed/actions)
+> Conecta cidadãos a pontos de coleta de resíduos de saúde (medicamentos, agulhas, máscaras), oferece assistência por IA com contexto especializado e recompensa o descarte correto com EcoCoins.
 
-PWA para facilitar o descarte correto de medicamentos vencidos ou sem uso no Brasil, conectando cidadãos a pontos de coleta cadastrados (farmácias, unidades de saúde, ecopontos).
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://typescriptlang.org)
+[![React](https://img.shields.io/badge/React-18-61DAFB)](https://reactjs.org)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+pgvector-336791)](https://postgresql.org)
+[![Ollama](https://img.shields.io/badge/LLM-Qwen3%3A8b-orange)](https://ollama.com)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+PWA para facilitar o descarte correto de resíduos de saúde no Brasil, conectando cidadãos a pontos de coleta cadastrados, com assistente de IA especializado e sistema de recompensas EcoCoin.
 
 ---
 

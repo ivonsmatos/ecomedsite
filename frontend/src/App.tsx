@@ -21,6 +21,7 @@ const AdminPontos = lazy(() => import('@/pages/Admin/Pontos'))
 const AdminUsuarios = lazy(() => import('@/pages/Admin/Usuarios'))
 const Blog = lazy(() => import('@/pages/Blog/Blog'))
 const BlogArtigo = lazy(() => import('@/pages/Blog/Artigo'))
+const Chat = lazy(() => import('@/pages/Chat/Chat'))
 
 function App() {
   return (
@@ -38,6 +39,16 @@ function App() {
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/cadastro" element={<Cadastro />} />
           <Route path="/auth/recuperar-senha" element={<RecuperarSenha />} />
+
+          {/* Chat IA */}
+          <Route
+            path="/app/chat"
+            element={
+              <ProtectedRoute>
+                <Chat />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Cidadão autenticado */}
           <Route

@@ -1,8 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { MapPin, User, LogOut, Menu, X } from 'lucide-react'
+import { MapPin, User, LogOut, Menu, X, MessageCircle } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
+import EcoCoinWidget from '@/components/ecocoin/EcoCoinWidget'
 
 export default function Header() {
   const { isAuthenticated, usuario, logout } = useAuth()
@@ -48,6 +49,14 @@ export default function Header() {
             </>
           ) : (
             <div className="flex items-center gap-3">
+              <EcoCoinWidget />
+              <Link
+                to="/app/chat"
+                className="flex items-center gap-1 text-text hover:text-primary transition-colors"
+                title="Assistente IA EcoMed"
+              >
+                <MessageCircle className="w-4 h-4" />
+              </Link>
               <span className="text-text-muted">Olá, {usuario?.nome.split(' ')[0]}</span>
               <Link
                 to={usuario?.perfil === 'ADMIN' ? '/admin/dashboard' : usuario?.perfil === 'PARCEIRO' ? '/parceiro/dashboard' : '/app/perfil'}

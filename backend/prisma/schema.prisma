@@ -24,10 +24,13 @@ model Usuario {
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
 
-  favoritos Favorito[]
-  reportes  Reporte[]
-  parceiro  Parceiro?
-  tokens    RefreshToken[]
+  favoritos       Favorito[]
+  reportes        Reporte[]
+  parceiro        Parceiro?
+  tokens          RefreshToken[]
+  ecocoinSaldo    EcocoinSaldo?
+  ecocoinTxs      EcocoinTransacao[]
+  ecocoinResgates EcocoinResgate[]
 
   @@map("usuarios")
 }
@@ -228,4 +231,79 @@ model Artigo {
   atualizadoEm DateTime  @updatedAt
 
   @@map("artigos")
+}
+
+// ─── ECOCOIN ─────────────────────────────────────────────────
+
+model EcocoinSaldo {
+  usuarioId    String   @id @map("usuario_id")
+  saldo        Int      @default(0)
+  totalGanho   Int      @default(0) @map("total_ganho")
+  totalUsado   Int      @default(0) @map("total_usado")
+  atualizadoEm DateTime @default(now()) @updatedAt @map("atualizado_em")
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("ecocoin_saldos")
+}
+
+model EcocoinTransacao {
+  id           String   @id @default(uuid())
+  usuarioId    String   @map("usuario_id")
+  tipo         String // ecocoin_tipo PG enum — validado no service
+  valor        Int
+  saldoApos    Int      @map("saldo_apos")
+  descricao    String?
+  referenciaId String?  @map("referencia_id")
+  metadata     Json     @default("{}")
+  criadoEm     DateTime @default(now()) @map("criado_em")
+
+  usuario  Usuario          @relation(fields: [usuarioId], references: [id])
+  resgates EcocoinResgate[]
+
+  @@map("ecocoin_transacoes")
+}
+
+model EcocoinRegra {
+  tipo         String  @id
+  valorPadrao  Int     @map("valor_padrao")
+  limiteDiario Int?    @map("limite_diario")
+  limiteTotal  Int?    @map("limite_total")
+  ativo        Boolean @default(true)
+  descricao    String?
+
+  @@map("ecocoin_regras")
+}
+
+model EcocoinResgate {
+  id            String    @id @default(uuid())
+  usuarioId     String    @map("usuario_id")
+  transacaoId   String    @map("transacao_id")
+  tipoResgate   String    @map("tipo_resgate")
+  valorEc       Int       @map("valor_ec")
+  valorReais    Decimal?  @map("valor_reais") @db.Decimal(10, 2)
+  parceiroId    String?   @map("parceiro_id")
+  codigoVoucher String?   @map("codigo_voucher")
+  status        String    @default("PENDENTE")
+  expiraEm      DateTime? @map("expira_em")
+  usadoEm       DateTime? @map("usado_em")
+  criadoEm      DateTime  @default(now()) @map("criado_em")
+
+  usuario   Usuario          @relation(fields: [usuarioId], references: [id])
+  transacao EcocoinTransacao @relation(fields: [transacaoId], references: [id])
+
+  @@map("ecocoin_resgates")
+}
+
+// ─── RAG / IA ─────────────────────────────────────────────────
+
+model KnowledgeChunk {
+  id        String                      @id @default(uuid())
+  content   String
+  embedding Unsupported("vector(768)")?
+  metadata  Json                        @default("{}")
+  fonte     String                      @default("actahub-v1")
+  criadoEm  DateTime                    @default(now()) @map("criado_em")
+
+  @@map("knowledge_chunks")
 }
